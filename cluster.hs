@@ -1,3 +1,8 @@
+import List
+import System.Random
+import Data.Array.IO
+import Control.Monad
+
 data Vec a = Vec [a]
 	deriving (Show, Eq)
 
@@ -24,6 +29,20 @@ divide :: (Num a,Fractional a) => Vec a -> a -> Vec a
 divide (Vec vec) sca =
 	Vec $ map (\x -> x / sca) vec  
 
+shuffle :: [a] -> IO [a]
+shuffle xs = do
+        ar <- newArray n xs
+        forM [1..n] $ \i -> do
+            j <- randomRIO (i,n)
+            vi <- readArray ar i
+            vj <- readArray ar j
+            writeArray ar j vi
+            return vj
+  where
+    n = length xs
+    newArray :: Int -> [a] -> IO (IOArray Int a)
+    newArray n xs =  newListArray (1,n) xs
+
 intToFloat :: Int -> Float
 intToFloat n = fromInteger $ toInteger n
 
@@ -39,13 +58,32 @@ groupNearest points means =
 	let clusters = map
 		(\i -> filter 
 			(\(_,meanlst) -> leastElem meanlst $ meanlst !! i)
-			dists) [0..((length means) - 1)] in
+			dists) [0..((genericLength means) - 1)] in
 	map (\el -> map (\(v,mlst) -> v) el) clusters
 
-findMean :: [Cluster Float] -> [Mean Float]
+findMean :: (Fractional a) => [Cluster a] -> [Mean a]
 findMean points =
 	map (\group ->
 			let sum = foldr (\x acc -> x + acc) (Vec [0.0,0.0,0.0]) group in
-			divide sum $ intToFloat (length group))
+			divide sum $ genericLength group)
 		points
+
+stop_now :: (Eq a) => [Cluster a] -> [Cluster a] -> Bool
+stop_now a b = a == b
+
+loop_means :: (Ord a,Fractional a) => [Vec a] -> [Cluster a] -> Int -> [Cluster a]
+loop_means points old k =
+	let means = findMean old in
+	let next = groupNearest points means in
+	case stop_now old next of
+		True -> next
+		False -> loop_means points next k 
+	
+
+kmeans :: (Ord a,Fractional a) => [Vec a] -> Int -> IO [Cluster a]
+kmeans points k = do
+	shuffed <- shuffle points
+	let means = take k shuffed
+	let begin = groupNearest points means
+	return $ loop_means points begin k 	
 
