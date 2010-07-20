@@ -9,7 +9,6 @@ data Vec a = Vec [a]
 type Mean a = Vec a
 type Cluster a = [Vec a]
 
-
 instance (Num a, Eq a, Show a) => Num (Vec a) where
 	(+) (Vec one) (Vec two) = 
 		Vec $ zipWith (+) one two
@@ -49,6 +48,31 @@ intToFloat n = fromInteger $ toInteger n
 leastElem :: (Ord a) => [a] -> a -> Bool
 leastElem lst el =
 	filter (\x -> x < el) lst == [] 
+
+contains :: (Eq a) => [a] -> a -> Bool
+contains [] el = False
+contains (x:xs) el =
+	case x == el of
+		True -> True
+		False -> contains xs el
+
+unique :: (Eq a) => [a] -> [a]
+unique [] = []
+unique (x:xs) =
+	if contains xs x then unique xs else x:(unique xs)
+
+count :: (Eq a) => [a] -> a -> Int
+count lst el =
+	length $ filter (\x -> x == el) lst
+
+frequency :: (Eq a) => [a] -> a -> Float
+frequency lst el = 
+	intToFloat (count lst el) / genericLength lst
+
+freqList :: (Eq a) => [a] -> [(a,Float)]
+freqList lst =
+	let uniq = unique lst in
+	map (\f -> (f,frequency lst f)) uniq
 
 groupNearest :: (Ord a,Num a) => [Vec a] -> [Mean a] -> [Cluster a]
 groupNearest points means =
