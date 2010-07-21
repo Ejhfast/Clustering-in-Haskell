@@ -2,9 +2,12 @@ import List
 import System.Random
 import Data.Array.IO
 import Control.Monad
+import qualified Data.Map as M
 
 data FloatVec = FloatVec {lst :: [Float]}
 	deriving (Show, Eq) 
+data WordVec = WordVec (M.Map String Float)
+	deriving (Show, Eq)
 
 class (Num a, Eq a, Show a) => Vec a where
 	mag :: a -> Float
@@ -52,6 +55,14 @@ shuffle xs = do
 
 intToFloat :: Int -> Float
 intToFloat n = fromInteger $ toInteger n
+
+insertPairList :: (Ord a) => [(a,b)] -> M.Map a b
+insertPairList lst =
+	foldr (\(a,b) acc -> M.insert a b acc) M.empty lst
+
+wordsToMap :: String -> M.Map String Float
+wordsToMap str =
+	insertPairList $ freqList $ words str
 
 leastElem :: (Ord a) => [a] -> a -> Bool
 leastElem lst el =
