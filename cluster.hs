@@ -6,13 +6,17 @@ import qualified Data.Map as M
 
 data FloatVec = FloatVec {lst :: [Float]}
 	deriving (Show, Eq) 
-data WordVec = WordVec (M.Map String Float)
-	deriving (Show, Eq)
+data WordVec = WordVec {m :: (M.Map String Float), name :: String} 
+	deriving (Eq)
 
 class (Num a, Eq a, Show a) => Vec a where
 	mag :: a -> Float
 	divide :: a -> Float -> a
 	zero :: Int -> a
+
+instance Show WordVec where
+	show (WordVec a b) = 
+		show b
 
 instance Num FloatVec where
 	(+) (FloatVec one) (FloatVec two) = 
@@ -27,6 +31,16 @@ instance Num FloatVec where
 		FloatVec $ [foldr (*) 1 signs] where
 			signs = map signum one
 	fromInteger i = FloatVec [intToFloat $ fromInteger i]
+
+instance Num WordVec where
+	(+) (WordVec a s1) (WordVec b s2) =
+		WordVec (M.unionWith (+) a b) "+"
+	(-) (WordVec a s1) (WordVec b s2) =
+		WordVec (M.unionWith (-) a b) "-"
+	(*) (WordVec a s1) (WordVec b s2) =
+		WordVec (M.unionWith (*) a b) "*"
+	abs (WordVec a s1) =
+		WordVec (M.map (\v-> abs v) a) s1
 	
 instance Vec FloatVec where
 	--mag :: Vec a -> a
@@ -38,6 +52,16 @@ instance Vec FloatVec where
 	zero i =
 		FloatVec v where	
 			v = map (\x -> 0.0) [1..i]
+
+instance Vec WordVec where
+	mag (WordVec a s) = 
+		let sqr = M.map (\v -> v*v) a in
+		let (sum,_) = M.mapAccum (\a b-> (a+b,b)) 0 sqr in
+		sum
+	divide (WordVec a s) sca =
+		WordVec (M.map (\v-> v / sca) a) s
+	zero i =
+		WordVec M.empty "empty"
 
 shuffle :: [a] -> IO [a]
 shuffle xs = do
@@ -52,6 +76,10 @@ shuffle xs = do
     n = length xs
     newArray :: Int -> [a] -> IO (IOArray Int a)
     newArray n xs =  newListArray (1,n) xs
+
+stringToWordVec :: String -> WordVec
+stringToWordVec str =
+	WordVec (wordsToMap str) str
 
 intToFloat :: Int -> Float
 intToFloat n = fromInteger $ toInteger n
