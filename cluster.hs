@@ -81,6 +81,11 @@ stringToWordVec :: String -> WordVec
 stringToWordVec str =
 	WordVec (wordsToMap str) str
 
+fileToWordVec :: FilePath -> IO WordVec
+fileToWordVec fp = do
+	str <- readFile fp
+	return $ stringToWordVec str
+
 intToFloat :: Int -> Float
 intToFloat n = fromInteger $ toInteger n
 
