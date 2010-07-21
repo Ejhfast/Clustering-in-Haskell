@@ -3,35 +3,37 @@ import System.Random
 import Data.Array.IO
 import Control.Monad
 
-data Vec = Vec {lst :: [Float]}
-	deriving (Show, Eq)
-data V = V Int | Float | Double
-	deriving (Show, Eq)
+data FloatVec = FloatVec {lst :: [Float]}
+	deriving (Show, Eq) 
 
-class (Num a, Eq a, Show a) => Mag a where
+class (Num a, Eq a, Show a) => Vec a where
 	mag :: a -> Float
 	divide :: a -> Float -> a
 	zero :: Int -> a
 
-instance Num Vec where
-	(+) (Vec one) (Vec two) = 
-		Vec $ zipWith (+) one two
-	(-) (Vec one) (Vec two) = 
-		Vec $ zipWith (-) one two
-	(*) (Vec one) (Vec two) =
-		Vec $ zipWith (*) one two
-	abs (Vec one) = 
-		Vec $ map abs one
+instance Num FloatVec where
+	(+) (FloatVec one) (FloatVec two) = 
+		FloatVec $ zipWith (+) one two
+	(-) (FloatVec one) (FloatVec two) = 
+		FloatVec $ zipWith (-) one two
+	(*) (FloatVec one) (FloatVec two) =
+		FloatVec $ zipWith (*) one two
+	abs (FloatVec one) = 
+		FloatVec $ map abs one
+	signum (FloatVec one) =
+		FloatVec $ [foldr (*) 1 signs] where
+			signs = map signum one
+	fromInteger i = FloatVec [intToFloat $ fromInteger i]
 	
-instance Mag Vec where
+instance Vec FloatVec where
 	--mag :: Vec a -> a
-	mag (Vec one) =
+	mag (FloatVec one) =
 		let sqr = map (\x -> x*x) one in
 		foldr (+) 0 sqr
-	divide (Vec vec) sca =
-		Vec $ map (\x -> x / sca) vec
+	divide (FloatVec vec) sca =
+		FloatVec $ map (\x -> x / sca) vec
 	zero i =
-		Vec v where	
+		FloatVec v where	
 			v = map (\x -> 0.0) [1..i]
 
 shuffle :: [a] -> IO [a]
@@ -86,7 +88,7 @@ freqList lst =
 	let uniq = unique lst in
 	map (\f -> (f,frequency lst f)) uniq
 
-groupNearest :: (Mag a) => [a] -> [a] -> [[a]]
+groupNearest :: (Vec a) => [a] -> [a] -> [[a]]
 groupNearest points means =
 	let dists = map
 		(\x -> (x, map (\y -> mag $ x - y) means))
@@ -97,7 +99,7 @@ groupNearest points means =
 			dists) [0..((genericLength means) - 1)] in
 	map (\el -> map (\(v,mlst) -> v) el) clusters
 
-findMean :: (Mag a) => [[a]] -> [a]
+findMean :: (Vec a) => [[a]] -> [a]
 findMean points =
 	map (\group ->
 			let sum = foldr (\x acc -> x + acc) (zero shortlst) group in
@@ -108,7 +110,7 @@ findMean points =
 stop_now :: (Eq a) => [[a]] -> [[a]] -> Bool
 stop_now a b = a == b
 
-loop_means :: (Mag a) => [a] -> [[a]] -> Int -> [[a]]
+loop_means :: (Vec a) => [a] -> [[a]] -> Int -> [[a]]
 loop_means points old k =
 	let means = findMean old in
 	let next = groupNearest points means in
@@ -117,7 +119,7 @@ loop_means points old k =
 		False -> loop_means points next k 
 	
 
-kmeans :: (Mag a) => [a] -> Int -> IO [[a]]
+kmeans :: (Vec a) => [a] -> Int -> IO [[a]]
 kmeans points k = do
 	shuffed <- shuffle points
 	let means = take k shuffed
