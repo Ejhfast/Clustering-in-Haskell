@@ -86,10 +86,20 @@ stringToWordVec :: String -> WordVec
 stringToWordVec str =
 	WordVec (wordsToMap str) str
 
+fileToFileList :: FilePath -> IO [String]
+fileToFileList f = do
+	lststr <- readFile f
+	return $ lines lststr
+
 fileToWordVec :: FilePath -> IO WordVec
 fileToWordVec fp = do
 	str <- readFile fp
 	return $ stringToWordVec str
+
+fileListToVecs :: FilePath -> IO [WordVec]
+fileListToVecs p = do
+	lst <- fileToFileList p
+	mapM fileToWordVec lst
 
 intToFloat :: Int -> Float
 intToFloat n = fromInteger $ toInteger n
