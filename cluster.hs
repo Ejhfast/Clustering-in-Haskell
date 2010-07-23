@@ -77,6 +77,11 @@ shuffle xs = do
     newArray :: Int -> [a] -> IO (IOArray Int a)
     newArray n xs =  newListArray (1,n) xs
 
+removeCommonWords :: [String] -> [String]
+removeCommonWords wlst =
+	filter (\x -> not $ contains common x) wlst where
+		common = ["is","at","and","a","the","of","an","was","were","will","do","but","for","to"]
+
 stringToWordVec :: String -> WordVec
 stringToWordVec str =
 	WordVec (wordsToMap str) str
@@ -95,7 +100,7 @@ insertPairList lst =
 
 wordsToMap :: String -> M.Map String Float
 wordsToMap str =
-	insertPairList $ freqList $ words str
+	insertPairList $ freqList $ removeCommonWords $ words str
 
 leastElem :: (Ord a) => [a] -> a -> Bool
 leastElem lst el =
