@@ -86,6 +86,10 @@ stringToWordVec :: String -> WordVec
 stringToWordVec str =
 	WordVec (wordsToMap str) str
 
+numsToFloatVecs :: [[Float]] -> [FloatVec]
+numsToFloatVecs nums = 
+	map (\f -> FloatVec f) nums 
+
 fileToFileList :: FilePath -> IO [String]
 fileToFileList f = do
 	lststr <- readFile f
@@ -185,6 +189,7 @@ kmeans points k = do
 	let begin = groupNearest points means
 	return $ loop_means points begin k 	
 
---wordsToVector :: [String] -> [Vec a]
---wordsToVector wrds =
-	
+runOnFile fileName num = do
+	veclst <- fileListToVecs fileName
+	kmeans veclst num
+
