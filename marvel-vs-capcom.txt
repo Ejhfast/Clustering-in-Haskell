@@ -1,6 +1,6 @@
 "Becoming good in [Marvel vs. Capcom 2] is hard, becoming good in [Marvel vs. Capcom 3] is easy." -Justin Wong, tournament player
 
-That statement above, sent via Wong's Twitter account, is wrong for anyone who isn't Justin. Most of us are only mid-level fighting game players, if that, and while Marvel vs. Capcom 3 may not be the best game for tournament players—we'll know for sure when everyone begins to dig in after the game's release—it's certainly a wonderful game for everyone else.
+That statement above, sent via Wong's Twitter account, is wrong for anyone who isn't Justin. Most of us are only mid-level fighting game players, if that, and while Marvel vs. Capcom 3 may not be the best game for tournament playerswe'll know for sure when everyone begins to dig in after the game's releaseit's certainly a wonderful game for everyone else.
 
 Allow me to explain.
 
@@ -12,7 +12,9 @@ The game has a setting that allows you to perform combos and special attacks wit
 
 But for the love of Magneto, if you want to play this game, get an arcade stick. I've been suffering through special attacks and combos using the stock Xbox 360 controller and it's a frustrating mess. You need a good digital pad to enjoy this game, period.
 
-You'll learn quickly that combos are now more... experimental? They aren't just a matter of memorizing a series of button presses and hard rules; now the game rewards some creative thinking and exploration.
+You'll learn quickly that combos are now more... experimental? They aren't just a matter of
+memorizing a series of button presses and hard rules; now the game rewards some creative thinking
+and exploration.
 
 "Capcom has removed nearly all of the esoteric rules used to prevent infinite combos and replaced them with one simple restriction: hit stun decay," Shoryuken writer "inkblot" explained. "Put simply, the more hits you inflict on your opponent, the faster they recover from the next hit. Eventually their recovery is faster than your fastest move, so the combo ends."
 
