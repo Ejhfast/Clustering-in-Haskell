@@ -82,9 +82,10 @@ removeCommonWords wlst =
 	filter (\x -> not $ contains common x) wlst where
 		common = ["is","at","and","a","the","of","an","was","were","will","do","but","for","to"]
 
-stringToWordVec :: String -> WordVec
-stringToWordVec str =
-	WordVec (wordsToMap str) str
+stringToWordVec :: String -> String -> WordVec
+stringToWordVec str title =
+	WordVec (wordsToMap str) title
+
 
 numsToFloatVecs :: [[Float]] -> [FloatVec]
 numsToFloatVecs nums = 
@@ -98,7 +99,7 @@ fileToFileList f = do
 fileToWordVec :: FilePath -> IO WordVec
 fileToWordVec fp = do
 	str <- readFile fp
-	return $ stringToWordVec str
+	return $ stringToWordVec str fp
 
 fileListToVecs :: FilePath -> IO [WordVec]
 fileListToVecs p = do
