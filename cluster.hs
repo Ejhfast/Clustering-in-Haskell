@@ -1,8 +1,13 @@
+module Cluster (runOnFile) where
 import List
 import System.Random
+import System.IO
+import System ( getArgs )
 import Data.Array.IO
 import Control.Monad
+import Control.Exception
 import qualified Data.Map as M
+import StrictRead
 
 data FloatVec = FloatVec {lst :: [Float]}
 	deriving (Show, Eq) 
@@ -83,7 +88,7 @@ removeCommonWords wlst =
 		common = ["is","at","and","a","the","of","an","was","were","will","do","but","for","to"]
 
 stringToWordVec :: String -> String -> WordVec
-stringToWordVec str title =
+stringToWordVec title str =
 	WordVec (wordsToMap str) title
 
 
@@ -93,18 +98,31 @@ numsToFloatVecs nums =
 
 fileToFileList :: FilePath -> IO [String]
 fileToFileList f = do
-	lststr <- readFile f
-	return $ lines lststr
+	str <- readFile' f
+	return $ lines str
+
+--	bracket (openFile f ReadMode) hClose 
+--	(\h -> do
+--		str <- hGetContents h
+--		putStrLn str
+--		return $ lines str)
 
 fileToWordVec :: FilePath -> IO WordVec
 fileToWordVec fp = do
-	str <- readFile fp
-	return $ stringToWordVec str fp
+	str <- readFile' fp
+	return $ stringToWordVec fp str
+
+--	bracket (openFile fp ReadMode) hClose 
+--	(\h -> do
+--		str <- hGetContents h
+--		putStrLn str
+--		return $ stringToWordVec fp str)
 
 fileListToVecs :: FilePath -> IO [WordVec]
 fileListToVecs p = do
 	lst <- fileToFileList p
-	mapM fileToWordVec lst
+	putStrLn "-- Beginning to Read Files --"
+	mapM (\h -> do { putStrLn h ; fileToWordVec h }) lst
 
 intToFloat :: Int -> Float
 intToFloat n = fromInteger $ toInteger n
@@ -192,5 +210,9 @@ kmeans points k = do
 
 runOnFile fileName num = do
 	veclst <- fileListToVecs fileName
-	kmeans veclst num
-
+	putStrLn "-- Finished Reading Files --"
+	out <- kmeans veclst num
+	mapM (\i -> do
+		putStrLn $ "!!!  " ++ (show i) ++ "  !!!"	
+		putStrLn $ show $ out !! i)
+		[0..(num-1)]
