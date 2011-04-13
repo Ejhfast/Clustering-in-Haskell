@@ -1,4 +1,5 @@
 module Cluster (runOnFile) where
+import Prelude
 import List
 import System.Random
 import System.IO
@@ -85,7 +86,7 @@ shuffle xs = do
 removeCommonWords :: [String] -> [String]
 removeCommonWords wlst =
 	filter (\x -> not $ contains common x) wlst where
-		common = ["is","at","and","a","the","of","an","was","were","will","do","but","for","to"]
+		common = ["is","at","and","a","the","of","an","was","were","will","do","but","for","to","it","in","that","be","are","has","with","its"]
 
 stringToWordVec :: String -> String -> WordVec
 stringToWordVec title str =
@@ -199,20 +200,31 @@ loop_means points old k =
 	case stop_now old next of
 		True -> next
 		False -> loop_means points next k 
-	
 
 kmeans :: (Vec a) => [a] -> Int -> IO [[a]]
 kmeans points k = do
 	shuffed <- shuffle points
 	let means = take k shuffed
 	let begin = groupNearest points means
-	return $ loop_means points begin k 	
+	return $ loop_means points begin k
 
 runOnFile fileName num = do
 	veclst <- fileListToVecs fileName
-	putStrLn "-- Finished Reading Files --"
+	putStrLn "-- Finished Reading the Files --"
 	out <- kmeans veclst num
 	mapM (\i -> do
 		putStrLn $ "!!!  " ++ (show i) ++ "  !!!"	
-		putStrLn $ show $ out !! i)
+		putStrLn $ show $ out !! i
+		putStrLn "Frequent Words:"
+		putStrLn $ show $ mostCommon $ out !! i)
 		[0..(num-1)]
+		
+mostCommon :: [WordVec] -> [String]
+mostCommon tgr =
+	let maps = map (\(WordVec a b) -> (M.filter (> 0.0) a)) tgr in
+	let all_words = foldl (M.unionWith (+)) (M.empty) maps in
+	--let relevant = foldl (M.intersectionWith (+)) all_words maps in
+	--let backwards = sortBy (\w1 w2 -> compare (relevant M.! w1) (relevant M.! w2)) (M.keys relevant) in
+	--reverse backwards
+	let sorted = sortBy(\w1 w2 -> compare (all_words M.! w1) (all_words M.! w2)) (M.keys all_words) in
+	take 10 $ reverse sorted
